@@ -22,7 +22,9 @@ jobs:
 
       - name: Set up Docker image tag
         id: docker_tag
-        run: echo "tag=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        run: |
+          echo "repo_name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "tag=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: |
