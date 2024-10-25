@@ -7,11 +7,13 @@ from loguru import logger
 from playwright.async_api import async_playwright
 import random
 
+curent_path = os.path.dirname(os.path.abspath(__file__))
+
 HOME_URL = 'https://rewards.bing.com/'
 
 
 async def check_login(page):
-    buttons_selector = ['#acceptButton','#iShowSkip','#iNext','#iLooksGood']
+    buttons_selector = ['#acceptButton','#iShowSkip','#iNext','#iLooksGood','.ext-primary.ext-button']
     for selector in buttons_selector:
         try:
             await page.wait_for_selector(selector, timeout=1000)
@@ -118,7 +120,7 @@ async def do_more_promotions(page, account_email, dashboard_data):
 
 
 async def main() -> None:
-    with open('data/accounts.json', 'r') as f:
+    with open(f'{curent_path}/data/accounts.json', 'r') as f:
         accounts = json.loads(f.read())
 
     for account in accounts:
@@ -130,7 +132,7 @@ async def do_punch_cards(contex, account_email, dashboard_data):
     logger.info(f"{account_email} is processing punch cards")
     pure_cards = dashboard_data['punchCards']
 
-    uncompleted = [x for x in pure_cards if not x['parentPromotion']['complete']]
+    uncompleted = [x for x in pure_cards if x['parentPromotion'] and not x['parentPromotion'] ['complete']]
 
     if not uncompleted:
         logger.info(f"{account_email} punch cards are already completed")
@@ -187,7 +189,7 @@ async def process_account(account):
         page = await context.new_page()
 
         account_email = account['email']
-        cookie_path = f'data/{account_email}-cookies.json'
+        cookie_path = f'{curent_path}/data/{account_email}-cookies.json'
         if os.path.exists(cookie_path):
             logger.info(f'{account_email} cookies found, loading...')
             with open(cookie_path, 'r') as f:
